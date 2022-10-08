@@ -50,8 +50,8 @@ func (Data *App) ParseCommand(Text string) error {
 	if !reflect.DeepEqual(Default.Subcommand, SubCmd{}) {
 		var UptoDate SubCmd
 		for _, names := range GetAllNames(Text) {
-			if ok := Default.Subcommand.Name; ok == names {
-				UptoDate = Default.Subcommand
+			if d, ok := Default.Subcommand[names]; ok {
+				UptoDate = d
 				break
 			}
 		}
