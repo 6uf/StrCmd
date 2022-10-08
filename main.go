@@ -46,42 +46,50 @@ func (Data *App) ParseCommand(Text string) error {
 			Args: Default.args,
 		})
 	}
+
+	var UsingSubCmd bool
 	if Default.Subcommand != nil {
 		var UptoDate SubCmd
 		for _, names := range GetAllNames(Text) {
 			if d, ok := Default.Subcommand[names]; ok {
 				UptoDate = d
+				UsingSubCmd = true
 				break
 			}
 		}
-		if len(UptoDate.Args) > 0 {
-			for _, Args := range UptoDate.Args {
-				if strings.Contains(Args, "--") && strings.Contains(Text, Args) {
-					Default.args = append(Default.args, GennedArgs{
-						Name:   Args,
-						Value:  "true",
-						IsBool: true,
-					})
-				} else {
-					if Name, Value := GetKey(Args, Text); Name != "" && Value != "" {
+
+		if UsingSubCmd {
+			if len(UptoDate.Args) > 0 {
+				for _, Args := range UptoDate.Args {
+					if strings.Contains(Args, "--") && strings.Contains(Text, Args) {
 						Default.args = append(Default.args, GennedArgs{
-							Name:   Name,
-							Value:  Value,
-							IsBool: strings.Contains(Value, "--"),
+							Name:   Args,
+							Value:  "true",
+							IsBool: true,
 						})
+					} else {
+						if Name, Value := GetKey(Args, Text); Name != "" && Value != "" {
+							Default.args = append(Default.args, GennedArgs{
+								Name:   Name,
+								Value:  Value,
+								IsBool: strings.Contains(Value, "--"),
+							})
+						}
 					}
 				}
+				Args = append(Args, CommandArgs{
+					Name: Names,
+					Args: UptoDate.args,
+				})
 			}
-			Args = append(Args, CommandArgs{
-				Name: Names,
-				Args: UptoDate.args,
-			})
+			Data.Args = Args
+			if UptoDate.Action != nil {
+				UptoDate.Action()
+			}
 		}
-		Data.Args = Args
-		if UptoDate.Action != nil {
-			UptoDate.Action()
-		}
-	} else {
+	}
+
+	if !UsingSubCmd {
 		Data.Args = Args
 		if Default.Action != nil {
 			Default.Action()
