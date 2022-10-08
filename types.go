@@ -13,7 +13,6 @@ type Command struct {
 }
 
 type SubCmd struct {
-	Name   string
 	Args   []string
 	Action func()
 	args   []GennedArgs
