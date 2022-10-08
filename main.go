@@ -82,11 +82,11 @@ func (Data *App) ParseCommand(Text string) error {
 		if UptoDate.Action != nil {
 			UptoDate.Action()
 		}
-	}
-
-	Data.Args = Args
-	if Default.Action != nil {
-		Default.Action()
+	} else {
+		Data.Args = Args
+		if Default.Action != nil {
+			Default.Action()
+		}
 	}
 
 	Data.Args = []CommandArgs{}
