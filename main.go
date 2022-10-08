@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -23,7 +24,7 @@ func (Data *App) ParseCommand(Text string) error {
 			Names = names
 		}
 	}
-	if Default.NeedArgs {
+	if len(Default.Args) > 0 {
 		for _, Args := range Default.Args {
 			if strings.Contains(Args, "--") && strings.Contains(Text, Args) {
 				Default.args = append(Default.args, GennedArgs{
@@ -46,15 +47,15 @@ func (Data *App) ParseCommand(Text string) error {
 			Args: Default.args,
 		})
 	}
-	if Default.HasSub {
-		var UptoDate Command
+	if !reflect.DeepEqual(Default.Subcommand, SubCmd{}) {
+		var UptoDate SubCmd
 		for _, names := range GetAllNames(Text) {
-			if d, ok := Default.Subcommands[names]; ok {
-				UptoDate = d
+			if ok := Default.Subcommand.Name; ok == names {
+				UptoDate = Default.Subcommand
 				break
 			}
 		}
-		if UptoDate.NeedArgs {
+		if len(UptoDate.Args) > 0 {
 			for _, Args := range UptoDate.Args {
 				if strings.Contains(Args, "--") && strings.Contains(Text, Args) {
 					Default.args = append(Default.args, GennedArgs{
@@ -93,7 +94,7 @@ func (Data *App) ParseCommand(Text string) error {
 }
 
 func GetKey(Arg, Text string) (string, string) {
-	if Data := regexp.MustCompile(fmt.Sprintf("%v ([a-zA-Z0-9]+)", Arg)).FindAllStringSubmatch(Text, 1); len(Data) == 1 {
+	if Data := regexp.MustCompile(fmt.Sprintf("%v ([a-zA-Z0-9.-]+)", Arg)).FindAllStringSubmatch(Text, 1); len(Data) == 1 {
 		return Arg, Data[0][1]
 	}
 	return "", ""
