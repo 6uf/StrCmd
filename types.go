@@ -6,7 +6,7 @@ type App struct {
 }
 
 type Command struct {
-	Subcommand SubCmd
+	Subcommand map[string]SubCmd
 	Args       []string
 	Action     func()
 	args       []GennedArgs
