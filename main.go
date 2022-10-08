@@ -9,14 +9,14 @@ import (
 	"strings"
 )
 
-var Current []CommandArgs
+var Current CommandArgs
 
 func GetAllNames(Text string) []string {
 	return strings.Split(Text, " ")
 }
 
 func (Data *App) ParseCommand(Text string) error {
-	var Args []CommandArgs
+	var Args CommandArgs
 	var Default Command
 	var Names string
 	for _, names := range GetAllNames(Text) {
@@ -43,10 +43,10 @@ func (Data *App) ParseCommand(Text string) error {
 				}
 			}
 		}
-		Args = append(Args, CommandArgs{
+		Args = CommandArgs{
 			Name: Names,
 			Args: Default.args,
-		})
+		}
 	}
 
 	var UsingSubCmd bool
@@ -56,6 +56,7 @@ func (Data *App) ParseCommand(Text string) error {
 			if d, ok := Default.Subcommand[names]; ok {
 				UptoDate = d
 				UsingSubCmd = true
+				Names = names
 				break
 			}
 		}
@@ -79,12 +80,13 @@ func (Data *App) ParseCommand(Text string) error {
 						}
 					}
 				}
-				Args = append(Args, CommandArgs{
+
+				Args = CommandArgs{
 					Name: Names,
-					Args: UptoDate.args,
-				})
+					Args: Default.args,
+				}
 			}
-			Data.Args = Args
+
 			Current = Args
 			if UptoDate.Action != nil {
 				UptoDate.Action()
@@ -93,15 +95,11 @@ func (Data *App) ParseCommand(Text string) error {
 	}
 
 	if !UsingSubCmd {
-		Data.Args = Args
 		Current = Args
 		if Default.Action != nil {
 			Default.Action()
 		}
 	}
-
-	Current = []CommandArgs{}
-	Data.Args = []CommandArgs{}
 	return nil
 }
 
@@ -126,23 +124,19 @@ func Listen(show bool, input string) string {
 }
 
 func GetValue(Arg string) string {
-	for _, arg := range Current {
-		for _, arg := range arg.Args {
-			if arg.Name == Arg {
-				return arg.Value
-			}
+	for _, arg := range Current.Args {
+		if arg.Name == Arg {
+			return arg.Value
 		}
 	}
 	return ""
 }
 
 func GetInt(Arg string) int {
-	for _, arg := range Current {
-		for _, arg := range arg.Args {
-			if arg.Name == Arg {
-				if value, err := strconv.Atoi(arg.Value); err == nil {
-					return value
-				}
+	for _, arg := range Current.Args {
+		if arg.Name == Arg {
+			if value, err := strconv.Atoi(arg.Value); err == nil {
+				return value
 			}
 		}
 	}
@@ -150,11 +144,9 @@ func GetInt(Arg string) int {
 }
 
 func GetBool(Arg string) bool {
-	for _, arg := range Current {
-		for _, arg := range arg.Args {
-			if arg.Name == Arg && arg.IsBool {
-				return true
-			}
+	for _, arg := range Current.Args {
+		if arg.Name == Arg && arg.IsBool {
+			return true
 		}
 	}
 	return false
