@@ -132,7 +132,7 @@ func (Data *App) ParseCommand(Text string) error {
 
 			go func() {
 				for range ca {
-					c.Stop()
+					c.StopWithFlush()
 					wg.Done()
 					break
 				}
