@@ -4,9 +4,14 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"os/signal"
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
+	"time"
+
+	"github.com/Lambels/cronjob"
 )
 
 var Current CommandArgs
@@ -89,7 +94,28 @@ func (Data *App) ParseCommand(Text string) error {
 
 			Current = Args
 			if UptoDate.Action != nil {
-				UptoDate.Action()
+				c := cronjob.New()
+				ca := make(chan os.Signal, 1)
+				signal.Notify(ca, os.Interrupt)
+
+				var wg sync.WaitGroup
+				wg.Add(1)
+
+				go func() {
+					for range ca {
+						c.Stop()
+						wg.Done()
+						break
+					}
+				}()
+
+				c.AddFunc(func() error {
+					UptoDate.Action()
+					return nil
+				}, cronjob.In(c.Now(), 5*time.Second), cronjob.WithRunOnStart())
+
+				c.Run()
+				wg.Wait()
 			}
 		}
 	}
@@ -97,7 +123,28 @@ func (Data *App) ParseCommand(Text string) error {
 	if !UsingSubCmd {
 		Current = Args
 		if Default.Action != nil {
-			Default.Action()
+			c := cronjob.New()
+			ca := make(chan os.Signal, 1)
+			signal.Notify(ca, os.Interrupt)
+
+			var wg sync.WaitGroup
+			wg.Add(1)
+
+			go func() {
+				for range ca {
+					c.Stop()
+					wg.Done()
+					break
+				}
+			}()
+
+			c.AddFunc(func() error {
+				Default.Action()
+				return nil
+			}, cronjob.In(c.Now(), 5*time.Second), cronjob.WithRunOnStart())
+
+			c.Run()
+			wg.Wait()
 		}
 	}
 	return nil
