@@ -9,14 +9,13 @@ import (
 	"strings"
 )
 
-var AppConfig *App
+var Current []CommandArgs
 
 func GetAllNames(Text string) []string {
 	return strings.Split(Text, " ")
 }
 
 func (Data *App) ParseCommand(Text string) error {
-	AppConfig = Data
 	var Args []CommandArgs
 	var Default Command
 	var Names string
@@ -86,6 +85,7 @@ func (Data *App) ParseCommand(Text string) error {
 				})
 			}
 			Data.Args = Args
+			Current = Args
 			if UptoDate.Action != nil {
 				UptoDate.Action()
 			}
@@ -94,11 +94,13 @@ func (Data *App) ParseCommand(Text string) error {
 
 	if !UsingSubCmd {
 		Data.Args = Args
+		Current = Args
 		if Default.Action != nil {
 			Default.Action()
 		}
 	}
 
+	Current = []CommandArgs{}
 	Data.Args = []CommandArgs{}
 	return nil
 }
@@ -124,7 +126,7 @@ func Listen(show bool, input string) string {
 }
 
 func GetValue(Arg string) string {
-	for _, arg := range AppConfig.Args {
+	for _, arg := range Current {
 		for _, arg := range arg.Args {
 			if arg.Name == Arg {
 				return arg.Value
@@ -135,7 +137,7 @@ func GetValue(Arg string) string {
 }
 
 func GetInt(Arg string) int {
-	for _, arg := range AppConfig.Args {
+	for _, arg := range Current {
 		for _, arg := range arg.Args {
 			if arg.Name == Arg {
 				if value, err := strconv.Atoi(arg.Value); err == nil {
@@ -148,7 +150,7 @@ func GetInt(Arg string) int {
 }
 
 func GetBool(Arg string) bool {
-	for _, arg := range AppConfig.Args {
+	for _, arg := range Current {
 		for _, arg := range arg.Args {
 			if arg.Name == Arg && arg.IsBool {
 				return true
