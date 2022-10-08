@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -47,7 +46,7 @@ func (Data *App) ParseCommand(Text string) error {
 			Args: Default.args,
 		})
 	}
-	if !reflect.DeepEqual(Default.Subcommand, SubCmd{}) {
+	if Default.Subcommand != nil {
 		var UptoDate SubCmd
 		for _, names := range GetAllNames(Text) {
 			if d, ok := Default.Subcommand[names]; ok {
