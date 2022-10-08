@@ -9,11 +9,14 @@ import (
 	"strings"
 )
 
+var AppConfig *App
+
 func GetAllNames(Text string) []string {
 	return strings.Split(Text, " ")
 }
 
 func (Data *App) ParseCommand(Text string) error {
+	AppConfig = Data
 	var Args []CommandArgs
 	var Default Command
 	var Names string
@@ -120,8 +123,8 @@ func Listen(show bool, input string) string {
 	return scanner.Text()
 }
 
-func (D *App) GetValue(Arg string) string {
-	for _, arg := range D.Args {
+func GetValue(Arg string) string {
+	for _, arg := range AppConfig.Args {
 		for _, arg := range arg.Args {
 			if arg.Name == Arg {
 				return arg.Value
@@ -131,8 +134,8 @@ func (D *App) GetValue(Arg string) string {
 	return ""
 }
 
-func (D *App) GetInt(Arg string) int {
-	for _, arg := range D.Args {
+func GetInt(Arg string) int {
+	for _, arg := range AppConfig.Args {
 		for _, arg := range arg.Args {
 			if arg.Name == Arg {
 				if value, err := strconv.Atoi(arg.Value); err == nil {
@@ -144,8 +147,8 @@ func (D *App) GetInt(Arg string) int {
 	return 0
 }
 
-func (D *App) GetBool(Arg string) bool {
-	for _, arg := range D.Args {
+func GetBool(Arg string) bool {
+	for _, arg := range AppConfig.Args {
 		for _, arg := range arg.Args {
 			if arg.Name == Arg && arg.IsBool {
 				return true
