@@ -6,12 +6,17 @@ type App struct {
 }
 
 type Command struct {
-	Subcommands map[string]Command
-	HasSub      bool
-	Args        []string
-	NeedArgs    bool
-	Action      func()
-	args        []GennedArgs
+	Subcommand SubCmd
+	Args       []string
+	Action     func()
+	args       []GennedArgs
+}
+
+type SubCmd struct {
+	Name   string
+	Args   []string
+	Action func()
+	args   []GennedArgs
 }
 
 type CommandArgs struct {
