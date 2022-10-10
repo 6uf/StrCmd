@@ -11,15 +11,14 @@ import (
 
 var Current CommandArgs
 
-func GetAllNames(Text string) []string {
-	return strings.Split(Text, " ")
-}
-
 func (Data *App) ParseCommand(Text string) error {
 	var Args CommandArgs
 	var Default Command
 	var Names string
-	for _, names := range GetAllNames(Text) {
+	var ParsedNames []string = strings.Split(Text, " ")
+	var GennedArg = []GennedArgs{}
+
+	for _, names := range ParsedNames {
 		if d, ok := Data.Commands[names]; ok {
 			Default = d
 			Names = names
@@ -28,14 +27,14 @@ func (Data *App) ParseCommand(Text string) error {
 	if len(Default.Args) > 0 {
 		for _, Args := range Default.Args {
 			if strings.Contains(Args, "--") && strings.Contains(Text, Args) {
-				Default.args = append(Default.args, GennedArgs{
+				GennedArg = append(GennedArg, GennedArgs{
 					Name:   Args,
 					Value:  "true",
 					IsBool: true,
 				})
 			} else {
 				if Name, Value := GetKey(Args, Text); Name != "" && Value != "" {
-					Default.args = append(Default.args, GennedArgs{
+					GennedArg = append(GennedArg, GennedArgs{
 						Name:   Name,
 						Value:  Value,
 						IsBool: strings.Contains(Value, "--"),
@@ -45,61 +44,55 @@ func (Data *App) ParseCommand(Text string) error {
 		}
 		Args = CommandArgs{
 			Name: Names,
-			Args: Default.args,
+			Args: GennedArg,
 		}
 	}
 
-	var UsingSubCmd bool
 	if Default.Subcommand != nil {
 		var UptoDate SubCmd
-		for _, names := range GetAllNames(Text) {
+		for _, names := range ParsedNames {
 			if d, ok := Default.Subcommand[names]; ok {
 				UptoDate = d
-				UsingSubCmd = true
 				Names = names
 				break
 			}
 		}
-
-		if UsingSubCmd {
-			if len(UptoDate.Args) > 0 {
-				for _, Args := range UptoDate.Args {
-					if strings.Contains(Args, "--") && strings.Contains(Text, Args) {
-						Default.args = append(Default.args, GennedArgs{
-							Name:   Args,
-							Value:  "true",
-							IsBool: true,
+		if len(UptoDate.Args) > 0 {
+			for _, Args := range UptoDate.Args {
+				if strings.Contains(Args, "--") && strings.Contains(Text, Args) {
+					GennedArg = append(GennedArg, GennedArgs{
+						Name:   Args,
+						Value:  "true",
+						IsBool: true,
+					})
+				} else {
+					if Name, Value := GetKey(Args, Text); Name != "" && Value != "" {
+						GennedArg = append(GennedArg, GennedArgs{
+							Name:   Name,
+							Value:  Value,
+							IsBool: strings.Contains(Value, "--"),
 						})
-					} else {
-						if Name, Value := GetKey(Args, Text); Name != "" && Value != "" {
-							Default.args = append(Default.args, GennedArgs{
-								Name:   Name,
-								Value:  Value,
-								IsBool: strings.Contains(Value, "--"),
-							})
-						}
 					}
 				}
-
-				Args = CommandArgs{
-					Name: Names,
-					Args: Default.args,
-				}
 			}
 
-			Current = Args
-			if UptoDate.Action != nil {
-				UptoDate.Action()
+			Args = CommandArgs{
+				Name: Names,
+				Args: GennedArg,
 			}
 		}
-	}
 
-	if !UsingSubCmd {
+		Current = Args
+		if UptoDate.Action != nil {
+			UptoDate.Action()
+		}
+	} else {
 		Current = Args
 		if Default.Action != nil {
 			Default.Action()
 		}
 	}
+
 	return nil
 }
 
@@ -112,7 +105,9 @@ func GetKey(Arg, Text string) (string, string) {
 
 func (D *App) Run(inputtext string) {
 	for {
-		D.ParseCommand(Listen(true, inputtext))
+		if err := D.ParseCommand(Listen(true, inputtext)); err != nil {
+			panic(err)
+		}
 	}
 }
 

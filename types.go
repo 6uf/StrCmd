@@ -9,13 +9,11 @@ type Command struct {
 	Subcommand map[string]SubCmd
 	Args       []string
 	Action     func()
-	args       []GennedArgs
 }
 
 type SubCmd struct {
 	Args   []string
 	Action func()
-	args   []GennedArgs
 }
 
 type CommandArgs struct {
