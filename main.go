@@ -94,6 +94,11 @@ func (Data *App) ParseCommand(Text string) error {
 	}
 
 	if !UsingSub {
+		if !Data.DontUseBuiltinHelpCmd {
+			if strings.HasPrefix(Text, "help") {
+				fmt.Println(Data.FormatHelpText())
+			}
+		}
 		Current = Args
 		if Default.Action != nil {
 			Default.Action()
@@ -101,6 +106,35 @@ func (Data *App) ParseCommand(Text string) error {
 	}
 
 	return nil
+}
+
+func (Data *App) FormatHelpText() (Base string) {
+	if Data.Version != 0 {
+		Base += fmt.Sprintf("VERSION: %v\n\n", Data.Version)
+	} else {
+		Base += "VERSION: 1.0.0\n\n"
+	}
+
+	if Data.AppDescription != "" {
+		Base += "Description: " + Data.AppDescription + "\n\n"
+	}
+	for name, key := range Data.Commands {
+		if key.Description == "" {
+			key.Description = "A global command that is parsed through StrCmd (Description was empty!)"
+		}
+
+		var B string = " [ARGS"
+		if len(key.Args) > 0 {
+			for _, name := range key.Args {
+				B += name
+			}
+			B += "]"
+		}
+
+		Base += fmt.Sprintf("  - %v | %v%v\n", name, key.Description, B)
+	}
+
+	return
 }
 
 func GetKey(Arg, Text string) (string, string) {

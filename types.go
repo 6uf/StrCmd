@@ -1,14 +1,18 @@
 package StrCmd
 
 type App struct {
-	Commands map[string]Command
-	Args     []CommandArgs
+	Commands              map[string]Command
+	Version               float64
+	AppDescription        string
+	DontUseBuiltinHelpCmd bool
+	Args                  []CommandArgs
 }
 
 type Command struct {
-	Subcommand map[string]SubCmd
-	Args       []string
-	Action     func()
+	Description string
+	Subcommand  map[string]SubCmd
+	Args        []string
+	Action      func()
 }
 
 type SubCmd struct {
