@@ -2,7 +2,7 @@ package StrCmd
 
 type App struct {
 	Commands              map[string]Command
-	Version               float64
+	Version               string
 	AppDescription        string
 	DontUseBuiltinHelpCmd bool
 	Args                  []CommandArgs

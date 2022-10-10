@@ -109,7 +109,7 @@ func (Data *App) ParseCommand(Text string) error {
 }
 
 func (Data *App) FormatHelpText() (Base string) {
-	if Data.Version != 0 {
+	if Data.Version != "" {
 		Base += fmt.Sprintf("VERSION: %v\n\n", Data.Version)
 	} else {
 		Base += "VERSION: 1.0.0\n\n"
@@ -128,7 +128,8 @@ func ReturnCommandInfo(Value map[string]Command, Format string) (Base string) {
 		}
 
 		var B string = Format
-		var S string = "    [SUBCMD]\n"
+		D := "  SUBCMD(S)\n"
+		var S string = D
 		if len(key.Args) > 0 {
 			for _, name := range key.Args {
 				B += " " + name
@@ -150,20 +151,21 @@ func ReturnCommandInfo(Value map[string]Command, Format string) (Base string) {
 			}
 
 			if B != Format {
-				S += fmt.Sprintf("     - %v | %v%v\n", name, key.Description, B)
+				S += fmt.Sprintf("  + %v | %v%v\n", name, key.Description, B)
 			} else {
-				S += fmt.Sprintf("     - %v | %v\n", name, key.Description)
+				S += fmt.Sprintf("  + %v | %v\n", name, key.Description)
 			}
 		}
 
-		if B != Format && S != "    [SUBCMD]\n" {
-			Base += fmt.Sprintf("  - %v | %v%v\n%v\n", name, key.Description, B, S)
-		} else {
-			if S != "    [SUBCMD]\n" {
-				Base += fmt.Sprintf("  - %v | %v\n%v\n", name, key.Description, S)
-			} else {
-				Base += fmt.Sprintf("  - %v | %v\n", name, key.Description)
-			}
+		switch {
+		case B != Format && S != D:
+			Base += fmt.Sprintf("- %v | %v%v\n%v", name, key.Description, B, S)
+		case S != D:
+			Base += fmt.Sprintf("- %v | %v\n%v", name, key.Description, S)
+		case B != Format:
+			Base += fmt.Sprintf("- %v | %v%v\n", name, key.Description, B)
+		default:
+			Base += fmt.Sprintf("- %v | %v\n", name, key.Description)
 		}
 	}
 	return
@@ -195,7 +197,7 @@ func Listen(show bool, input string) string {
 	return scanner.Text()
 }
 
-func GetValue(Arg string) string {
+func String(Arg string) string {
 	for _, arg := range Current.Args {
 		if arg.Name == Arg {
 			return arg.Value
@@ -204,7 +206,7 @@ func GetValue(Arg string) string {
 	return ""
 }
 
-func GetInt(Arg string) int {
+func Int(Arg string) int {
 	for _, arg := range Current.Args {
 		if arg.Name == Arg {
 			if value, err := strconv.Atoi(arg.Value); err == nil {
@@ -215,11 +217,20 @@ func GetInt(Arg string) int {
 	return 0
 }
 
-func GetBool(Arg string) bool {
+func Bool(Arg string) bool {
 	for _, arg := range Current.Args {
 		if arg.Name == Arg && arg.IsBool {
 			return true
 		}
 	}
 	return false
+}
+
+func Interface(Arg string) interface{} {
+	for _, arg := range Current.Args {
+		if arg.Name == Arg && arg.IsBool {
+			return arg.Value
+		}
+	}
+	return nil
 }
