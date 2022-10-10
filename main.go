@@ -150,7 +150,7 @@ func ReturnCommandInfo(Value map[string]Command, Format string) (Base string) {
 			}
 
 			if B != Format {
-				S += fmt.Sprintf("     - %v | %v\n%v\n", name, key.Description, B)
+				S += fmt.Sprintf("     - %v | %v%v\n", name, key.Description, B)
 			} else {
 				S += fmt.Sprintf("     - %v | %v\n", name, key.Description)
 			}
@@ -180,10 +180,10 @@ func GetKey(Arg, Text string) (string, string) {
 	return "", ""
 }
 
-func (D *App) Run(inputtext string) {
+func (D *App) Run(inputtext string) error {
 	for {
 		if err := D.ParseCommand(Listen(true, inputtext)); err != nil {
-			panic(err)
+			return err
 		}
 	}
 }
