@@ -228,7 +228,7 @@ func Bool(Arg string) bool {
 
 func Interface(Arg string) interface{} {
 	for _, arg := range Current.Args {
-		if arg.Name == Arg && arg.IsBool {
+		if arg.Name == Arg {
 			return arg.Value
 		}
 	}
