@@ -176,7 +176,7 @@ func ReturnSubCmdInfo() (Base string) {
 }
 
 func GetKey(Arg, Text string) (string, string) {
-	if Data := regexp.MustCompile(fmt.Sprintf(`%v ([a-zA-Z0-9\/.>,<?'`+"`"+`";:[{}=_*&^%$#@!~-]+)`, Arg)).FindAllStringSubmatch(Text, 1); len(Data) == 1 {
+	if Data := regexp.MustCompile(fmt.Sprintf(`%v ([]a-zA-Z0-9\/[.>,<?'`+"`"+`";:{}=_*&^%$#@!~-]+)`, Arg)).FindAllStringSubmatch(Text, 1); len(Data) == 1 {
 		return Arg, Data[0][1]
 	}
 	return "", ""
