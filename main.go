@@ -150,10 +150,10 @@ func ReturnCommandInfo(Value map[string]Command, Format string) (Base string) {
 			}
 
 			if B != Format {
-				S += fmt.Sprintf("     - %v | %v%v", name, key.Description, B)
+				S += fmt.Sprintf("     - %v | %v\n%v\n", name, key.Description, B)
 			}
 
-			S += fmt.Sprintf("     - %v | %v", name, key.Description)
+			S += fmt.Sprintf("     - %v | %v\n", name, key.Description)
 		}
 
 		if B != Format && S != "   [SUBCMD]" {
