@@ -29,5 +29,4 @@ type CommandArgs struct {
 type GennedArgs struct {
 	Name   string
 	Value  string
-	IsBool bool
 }
