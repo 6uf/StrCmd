@@ -15,6 +15,17 @@ import (
 )
 
 func main() {
+	fmt.Print(`
+▓█████▄   ██████ 
+▒██▀ ██▌▒██    ▒ 
+░██   █▌░ ▓██▄   
+░▓█▄   ▌  ▒   ██▒
+░▒████▓ ▒██████▒▒
+ ▒▒▓  ▒ ▒ ▒▓▒ ▒ ░
+ ░ ▒  ▒ ░ ░▒  ░ ░
+ ░ ░  ░ ░  ░  ░  
+   ░          ░                
+`)
 	a := StrCmd.App{
 		//DontUseBuiltinHelpCmd: true,
 		Version:        "v2.0.0",
@@ -23,11 +34,12 @@ func main() {
 			"input": {
 				Description: "Test inputs!",
 				Action: func() {
-					fmt.Println(StrCmd.String("-name"))
+					fmt.Println(StrCmd.String("-name"), StrCmd.Float64("-float"), StrCmd.Bool("--ok"))
 				},
-
 				Args: []string{
 					"-name",
+					"-float",
+					"--ok",
 				},
 			},
 			"subcmdtests": {
@@ -84,5 +96,4 @@ func main() {
 	}
 	a.Run(">>: ")
 }
-
 ```
