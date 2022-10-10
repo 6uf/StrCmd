@@ -16,8 +16,9 @@ type Command struct {
 }
 
 type SubCmd struct {
-	Args   []string
-	Action func()
+	Description string
+	Args        []string
+	Action      func()
 }
 
 type CommandArgs struct {

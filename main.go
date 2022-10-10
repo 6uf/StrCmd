@@ -126,15 +126,34 @@ func (Data *App) FormatHelpText() (Base string) {
 		var B string = " [ARGS"
 		if len(key.Args) > 0 {
 			for _, name := range key.Args {
-				B += name
+				B += " " + name
 			}
 			B += "]"
 		}
 
-		Base += fmt.Sprintf("  - %v | %v%v\n", name, key.Description, B)
+		var S string = "    [SUBCMDS]"
+		if key.Subcommand != nil {
+			for name, key := range key.Subcommand {
+				if key.Description == "" {
+					key.Description = "A global command that is parsed through StrCmd (Description was empty!)"
+				}
+
+				S += fmt.Sprintf("      - %v | %v\n", name, key.Description)
+			}
+		}
+
+		if B != " [ARGS" {
+			Base += fmt.Sprintf("  - %v | %v%v\n", name, key.Description, B)
+		} else {
+			Base += fmt.Sprintf("  - %v | %v\n", name, key.Description)
+		}
 	}
 
 	return
+}
+
+func ReturnCommandInfo() {
+
 }
 
 func GetKey(Arg, Text string) (string, string) {
