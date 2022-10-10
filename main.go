@@ -26,11 +26,20 @@ func (Data *App) ParseCommand(Text string) error {
 	}
 	if len(Default.Args) > 0 {
 		for _, Args := range Default.Args {
-			if Name, Value := GetKey(Args, Text); Name != "" && Value != "" {
+			if strings.Contains(Args, "--") && strings.Contains(Text, Args) {
 				GennedArg = append(GennedArg, GennedArgs{
-					Name:  Name,
-					Value: Value,
+					Name:   Args,
+					Value:  "true",
+					IsBool: true,
 				})
+			} else {
+				if Name, Value := GetKey(Args, Text); Name != "" && Value != "" {
+					GennedArg = append(GennedArg, GennedArgs{
+						Name:   Name,
+						Value:  Value,
+						IsBool: strings.Contains(Value, "--"),
+					})
+				}
 			}
 		}
 		Args = CommandArgs{
@@ -54,11 +63,20 @@ func (Data *App) ParseCommand(Text string) error {
 		if UsingSub {
 			if len(UptoDate.Args) > 0 {
 				for _, Args := range UptoDate.Args {
-					if Name, Value := GetKey(Args, Text); Name != "" && Value != "" {
+					if strings.Contains(Args, "--") && strings.Contains(Text, Args) {
 						GennedArg = append(GennedArg, GennedArgs{
-							Name:  Name,
-							Value: Value,
+							Name:   Args,
+							Value:  "true",
+							IsBool: true,
 						})
+					} else {
+						if Name, Value := GetKey(Args, Text); Name != "" && Value != "" {
+							GennedArg = append(GennedArg, GennedArgs{
+								Name:   Name,
+								Value:  Value,
+								IsBool: strings.Contains(Value, "--"),
+							})
+						}
 					}
 				}
 
@@ -201,7 +219,7 @@ func Int(Arg string) int {
 
 func Bool(Arg string) bool {
 	for _, arg := range Current.Args {
-		if arg.Name == Arg {
+		if arg.Name == Arg && arg.IsBool {
 			return true
 		}
 	}
