@@ -237,7 +237,7 @@ func Interface(Arg string) interface{} {
 
 func Float64(Arg string) float64 {
 	for _, arg := range Current.Args {
-		if arg.Name == Arg && arg.IsBool {
+		if arg.Name == Arg {
 			if s, err := strconv.ParseFloat(arg.Value, 64); err == nil {
 				return s
 			}
@@ -248,7 +248,7 @@ func Float64(Arg string) float64 {
 
 func Float32(Arg string) float64 {
 	for _, arg := range Current.Args {
-		if arg.Name == Arg && arg.IsBool {
+		if arg.Name == Arg {
 			if s, err := strconv.ParseFloat(arg.Value, 32); err == nil {
 				return s
 			}
