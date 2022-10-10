@@ -114,16 +114,21 @@ func (Data *App) FormatHelpText() (Base string) {
 	} else {
 		Base += "VERSION: 1.0.0\n\n"
 	}
-
 	if Data.AppDescription != "" {
 		Base += "Description: " + Data.AppDescription + "\n\n"
 	}
-	for name, key := range Data.Commands {
+	Base += ReturnCommandInfo(Data.Commands, " [ARGS")
+	return
+}
+
+func ReturnCommandInfo(Value map[string]Command, Format string) (Base string) {
+	for name, key := range Value {
 		if key.Description == "" {
 			key.Description = "A global command that is parsed through StrCmd (Description was empty!)"
 		}
 
-		var B string = " [ARGS"
+		var B string = Format
+		var S string = "   [SUBCMD]"
 		if len(key.Args) > 0 {
 			for _, name := range key.Args {
 				B += " " + name
@@ -131,29 +136,41 @@ func (Data *App) FormatHelpText() (Base string) {
 			B += "]"
 		}
 
-		var S string = "    [SUBCMDS]"
-		if key.Subcommand != nil {
-			for name, key := range key.Subcommand {
-				if key.Description == "" {
-					key.Description = "A global command that is parsed through StrCmd (Description was empty!)"
-				}
-
-				S += fmt.Sprintf("      - %v | %v\n", name, key.Description)
+		for name, key := range key.Subcommand {
+			if key.Description == "" {
+				key.Description = "A global command that is parsed through StrCmd (Description was empty!)"
 			}
+
+			var B string = Format
+			if len(key.Args) > 0 {
+				for _, name := range key.Args {
+					B += " " + name
+				}
+				B += "]"
+			}
+
+			if B != Format {
+				S += fmt.Sprintf("     - %v | %v%v", name, key.Description, B)
+			}
+
+			S += fmt.Sprintf("     - %v | %v", name, key.Description)
 		}
 
-		if B != " [ARGS" {
-			Base += fmt.Sprintf("  - %v | %v%v\n", name, key.Description, B)
-		} else {
-			Base += fmt.Sprintf("  - %v | %v\n", name, key.Description)
+		if B != Format && S != "   [SUBCMD]" {
+			Base += fmt.Sprintf("  - %v | %v%v\n%v\n", name, key.Description, B, S)
 		}
+
+		if S != "   [SUBCMD]" {
+			Base += fmt.Sprintf("  - %v | %v\n%v\n", name, key.Description, S)
+		}
+
+		Base += fmt.Sprintf("  - %v | %v\n", name, key.Description)
 	}
-
 	return
 }
 
-func ReturnCommandInfo() {
-
+func ReturnSubCmdInfo() (Base string) {
+	return
 }
 
 func GetKey(Arg, Text string) (string, string) {
