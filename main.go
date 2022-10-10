@@ -128,7 +128,7 @@ func ReturnCommandInfo(Value map[string]Command, Format string) (Base string) {
 		}
 
 		var B string = Format
-		var S string = "   [SUBCMD]"
+		var S string = "    [SUBCMD]\n"
 		if len(key.Args) > 0 {
 			for _, name := range key.Args {
 				B += " " + name
@@ -151,20 +151,20 @@ func ReturnCommandInfo(Value map[string]Command, Format string) (Base string) {
 
 			if B != Format {
 				S += fmt.Sprintf("     - %v | %v\n%v\n", name, key.Description, B)
+			} else {
+				S += fmt.Sprintf("     - %v | %v\n", name, key.Description)
 			}
-
-			S += fmt.Sprintf("     - %v | %v\n", name, key.Description)
 		}
 
-		if B != Format && S != "   [SUBCMD]" {
+		if B != Format && S != "    [SUBCMD]\n" {
 			Base += fmt.Sprintf("  - %v | %v%v\n%v\n", name, key.Description, B, S)
+		} else {
+			if S != "    [SUBCMD]\n" {
+				Base += fmt.Sprintf("  - %v | %v\n%v\n", name, key.Description, S)
+			} else {
+				Base += fmt.Sprintf("  - %v | %v\n", name, key.Description)
+			}
 		}
-
-		if S != "   [SUBCMD]" {
-			Base += fmt.Sprintf("  - %v | %v\n%v\n", name, key.Description, S)
-		}
-
-		Base += fmt.Sprintf("  - %v | %v\n", name, key.Description)
 	}
 	return
 }
