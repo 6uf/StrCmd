@@ -182,9 +182,16 @@ func GetKey(Arg, Text string) (string, string) {
 	return "", ""
 }
 
+var input string
+
+func (D *App) ChangeInputText(new string) {
+	input = new
+}
+
 func (D *App) Run(inputtext string) error {
+	input = inputtext
 	for {
-		if err := D.ParseCommand(Listen(true, inputtext)); err != nil {
+		if err := D.ParseCommand(Listen(true, input)); err != nil {
 			return err
 		}
 	}
