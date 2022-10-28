@@ -184,7 +184,7 @@ func GetKey(Arg, Text string) (string, string) {
 
 var input string
 
-func (D *App) ChangeInputText(new string) {
+func ChangeInputText(new string) {
 	input = new
 }
 
