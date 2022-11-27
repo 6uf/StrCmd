@@ -197,6 +197,13 @@ func (D *App) Run(inputtext string) error {
 	}
 }
 
+func (D *App) Input(inputin string) error {
+	if err := D.ParseCommand(inputin); err != nil {
+		return err
+	}
+	return nil
+}
+
 func Listen(show bool, input string) string {
 	fmt.Print(input)
 	scanner := bufio.NewScanner(os.Stdin)
